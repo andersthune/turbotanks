@@ -1,0 +1,9 @@
+[package]
+name = "turbotanks"
+version = "0.1.0"
+authors = ["Anders Thuné <athune@kth.se>"]
+edition = "2018"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+sfml = "0.14.0"

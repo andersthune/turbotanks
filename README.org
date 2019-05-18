@@ -1,0 +1,35 @@
+#+TITLE: Turbo Tanks
+#+AUTHOR: Anders Ågren Thuné
+#+DATE: [2019-05-19 Sun]
+
+* Project Description
+  This is a remake of a game made by Anders Ågren Thuné and Jacob
+  Åslund in the spring of 2018, in turn based on the flash game [[https://www.miniclip.com/games/tiny-tanks/en/][Tiny
+  Tanks]]. The goals of this project are:
+  - Provide a more robust code base written in Rust
+  - Address bugs in the original game
+  - Replace copyrighted or otherwise dubious content
+  - Add new singleplayer content
+  - Add a multiplayer mode
+
+* Features
+  - [ ] Top-down obstacle-packed 2D world
+  - [ ] Varied and smart enemies
+  - [ ] Engaging boss fights
+  - [ ] Skill-based bullet hell gameplay
+  - [ ] Multiplayer arena mode
+
+* Dependencies
+  This game is written in Rust using the [[https://www.sfml-dev.org/][SFML]] 2.5 library bindings
+  provided by the [[https://github.com/jeremyletang/rust-sfml/][SFML]] crate.
+
+  See [file:Cargo.toml] for Rust dependency version info.
+
+* Installation
+** From source
+   1. Make sure you have Rust and the required dependencies
+   2. Clone the repository
+   3. Run the game using =cargo run=
+
+** Binary installation
+   To be added
