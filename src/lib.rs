@@ -1,20 +1,33 @@
 use sfml::graphics::{CircleShape, RenderTarget, RenderWindow};
+use settings::Settings;
 use sfml::window::{Event, Style};
+
+pub mod settings;
 
 pub struct Game {
     window: RenderWindow,
+    settings_path: &'static str,
+    settings: settings::Settings,
 }
 
 impl Game {
-    pub fn new() -> Game {
+    pub fn new(settings_path: &'static str) -> Game {
+        let settings = Settings::new(settings_path);
+
         let mut window = RenderWindow::new(
-            (800, 600),
+            settings.get_resolution(),
             "Turbo Tanks",
             Style::DEFAULT,
             &Default::default(),
         );
-        window.set_framerate_limit(60);
-        Game { window }
+
+        window.set_framerate_limit(settings.framerate_limit);
+
+        Game {
+            window,
+            settings_path,
+            settings,
+        }
     }
 
     pub fn running(&self) -> bool {
