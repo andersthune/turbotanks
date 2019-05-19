@@ -5,5 +5,13 @@ authors = ["Anders Thuné <athune@kth.se>"]
 edition = "2018"
 license = "GPL-3.0-or-later"
 
+[lib]
+name = "turbotanks"
+path = "src/lib.rs"
+
+[[bin]]
+name = "turbotanks"
+path = "src/main.rs"
+
 [dependencies]
 sfml = "0.14.0"
