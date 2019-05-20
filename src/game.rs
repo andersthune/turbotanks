@@ -3,6 +3,7 @@ use sfml::graphics::{CircleShape, RenderTarget, RenderWindow, Transformable};
 use sfml::system::{Vector2f, Vector2u};
 use sfml::window::{Event, Style};
 
+/// The main struct representing a running game
 pub struct Game {
     window: RenderWindow,
     settings_path: &'static str,
@@ -10,6 +11,7 @@ pub struct Game {
 }
 
 impl Game {
+    /// Create a new game, loading settings from the specified path
     pub fn new(settings_path: &'static str) -> Game {
         let settings = Settings::new(settings_path);
 
