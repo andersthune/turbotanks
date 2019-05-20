@@ -31,11 +31,14 @@ impl Game {
         }
     }
 
-    pub fn running(&self) -> bool {
-        self.window.is_open()
+    /// Run the game
+    pub fn run(&mut self) {
+        while self.window.is_open() {
+            self.update()
+        }
     }
 
-    pub fn update(&mut self) {
+    fn update(&mut self) {
         while let Some(event) = self.window.poll_event() {
             if let Event::Closed = event {
                 self.window.close()
