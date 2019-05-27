@@ -2,22 +2,15 @@ use serde_derive::{Deserialize, Serialize};
 use sfml::window::VideoMode;
 use std::fs;
 use std::io::Error;
-use Resolution::{Desktop, Size};
-
-/// An enum for resolution settings: either a specified size or the
-/// desktop default.
-#[derive(Serialize, Deserialize)]
-pub enum Resolution {
-    Size(u32, u32),
-    Desktop,
-}
 
 /// A struct containing the relevant settings for configuring a run of
 /// Turbo Tanks.
 #[derive(Serialize, Deserialize)]
 pub struct Settings {
     pub framerate_limit: u32,
-    pub resolution: Resolution,
+    /// The initial resolution of the game. None corresponds to the
+    /// default desktop resolution.
+    pub resolution: Option<(u32, u32)>,
 }
 
 impl Settings {
@@ -37,8 +30,8 @@ impl Settings {
     /// resolution.
     pub fn get_resolution(&self) -> VideoMode {
         match self.resolution {
-            Size(h, w) => From::from((h, w)),
-            Desktop => VideoMode::desktop_mode(),
+            Some(res) => From::from(res),
+            None => VideoMode::desktop_mode(),
         }
     }
 }
@@ -47,7 +40,7 @@ impl Default for Settings {
     fn default() -> Settings {
         Settings {
             framerate_limit: 120,
-            resolution: Desktop,
+            resolution: None,
         }
     }
 }
