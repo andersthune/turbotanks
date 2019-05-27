@@ -8,6 +8,7 @@ pub use game::Game;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use sfml::window::VideoMode;
     use std::fs;
     #[test]
     fn settings_parsed_correctly() {
@@ -41,5 +42,9 @@ resolution = [1920, 1080]
     }
 
     #[test]
-    fn game_loads_settings() {}
+    fn game_loads_settings() {
+        let game = Game::new("");
+        assert_eq!(game.settings.framerate_limit, 120);
+        assert_eq!(game.settings.get_resolution(), VideoMode::desktop_mode());
+    }
 }

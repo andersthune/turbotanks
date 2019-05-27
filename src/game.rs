@@ -5,9 +5,9 @@ use sfml::window::{Event, Style};
 
 /// The main struct representing a running game
 pub struct Game {
+    pub settings: Settings,
     window: RenderWindow,
     settings_path: &'static str,
-    settings: Settings,
 }
 
 impl Game {
