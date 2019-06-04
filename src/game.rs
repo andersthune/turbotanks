@@ -1,7 +1,7 @@
 use crate::settings::Settings;
-use sfml::graphics::{CircleShape, RenderTarget, RenderWindow, Transformable};
-use sfml::system::{Vector2f, Vector2u};
+use sfml::graphics::{RenderWindow, Drawable};
 use sfml::window::{Event, Key, Style};
+use std::rc::Rc;
 
 /// The main struct representing a running game
 pub struct Game {
@@ -40,6 +40,8 @@ impl Game {
     }
 }
 
+/// An enumeration used to represent actions in the menu. Different
+/// keys might be bound to the same abstract action.
 pub enum MenuAction {
     Up,
     Down,
@@ -49,6 +51,9 @@ pub enum MenuAction {
 }
 
 impl MenuAction {
+    /// Get the MenuAction corresponding to a given keycode. Later:
+    /// replace with a method for Game, loading a file containing the
+    /// bindings.
     pub fn get_menu_action_from_key(code: Key) -> Option<MenuAction> {
         match code {
             Key::Up | Key::W => Some(MenuAction::Up),
@@ -61,15 +66,26 @@ impl MenuAction {
     }
 }
 
+/// A struct representing a menu state in the game.
 pub struct MenuState<'a> {
     game: &'a mut Game,
+    graphics: Vec<Rc<dyn Drawable>>,
+    buttons: Vec<Rc<Button>>,
+    selected_button: Rc<Button>
 }
 
 impl<'a> MenuState<'a> {
+    /// Create a new menu state for the given game.
     pub fn new(game: &'a mut Game) -> MenuState<'a> {
-        MenuState { game }
+        MenuState {
+            game,
+            graphics: Vec::new(),
+            buttons: Vec::new(),
+            selected_button: Rc::new()
+        }
     }
 
+    /// Execute the state
     pub fn run_state(&mut self) {
         while self.game.is_running() {
             self.act_on_events();
@@ -89,9 +105,11 @@ impl<'a> MenuState<'a> {
     fn handle_key_press(&mut self, key: Key) {
         if let Some(action) = MenuAction::get_menu_action_from_key(key) {
             match action {
-                MenuAction::Up => {}
-
-                MenuAction::Down => {}
+                MenuAction::Up => ,
+                MenuAction::Down => ,
+                MenuAction::Right => ,
+                MenuAction::Left => ,
+                MenuAction::Enter => ,
             }
         }
     }
