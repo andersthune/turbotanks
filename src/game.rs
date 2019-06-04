@@ -1,7 +1,7 @@
 use crate::settings::Settings;
 use sfml::graphics::{CircleShape, RenderTarget, RenderWindow, Transformable};
 use sfml::system::{Vector2f, Vector2u};
-use sfml::window::{Event, Style};
+use sfml::window::{Event, Key, Style};
 
 /// The main struct representing a running game
 pub struct Game {
@@ -31,30 +31,68 @@ impl Game {
         }
     }
 
-    /// Run the game
-    pub fn run(&mut self) {
-        while self.window.is_open() {
-            self.update()
+    pub fn is_running(&self) -> bool {
+        self.window.is_open()
+    }
+
+    pub fn close(&mut self) {
+        self.window.close()
+    }
+}
+
+pub enum MenuAction {
+    Up,
+    Down,
+    Left,
+    Right,
+    Enter,
+}
+
+impl MenuAction {
+    pub fn get_menu_action_from_key(code: Key) -> Option<MenuAction> {
+        match code {
+            Key::Up | Key::W => Some(MenuAction::Up),
+            Key::Down | Key::S => Some(MenuAction::Down),
+            Key::Right | Key::D => Some(MenuAction::Right),
+            Key::Left | Key::A => Some(MenuAction::Left),
+            Key::Return => Some(MenuAction::Enter),
+            _ => None,
+        }
+    }
+}
+
+pub struct MenuState<'a> {
+    game: &'a mut Game,
+}
+
+impl<'a> MenuState<'a> {
+    pub fn new(game: &'a mut Game) -> MenuState<'a> {
+        MenuState { game }
+    }
+
+    pub fn run_state(&mut self) {
+        while self.game.is_running() {
+            self.act_on_events();
         }
     }
 
-    fn update(&mut self) {
-        while let Some(event) = self.window.poll_event() {
-            if let Event::Closed = event {
-                self.window.close()
+    fn act_on_events(&mut self) {
+        while let Some(event) = self.game.window.poll_event() {
+            match event {
+                Event::KeyPressed { code, .. } => self.handle_key_press(code),
+                Event::Closed => self.game.close(),
+                _ => (),
             }
         }
-        let mut circle = CircleShape::new(10.0, 50);
-        let Vector2u { x, y } = self.window.size();
-        let x = (x as f32) / 2.0;
-        let y = (y as f32) / 2.0;
+    }
 
-        circle.set_position(Vector2f { x, y });
+    fn handle_key_press(&mut self, key: Key) {
+        if let Some(action) = MenuAction::get_menu_action_from_key(key) {
+            match action {
+                MenuAction::Up => {}
 
-        self.window.set_active(true);
-
-        self.window.draw(&circle);
-
-        self.window.display()
+                MenuAction::Down => {}
+            }
+        }
     }
 }

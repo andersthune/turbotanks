@@ -3,7 +3,7 @@
 pub mod game;
 mod settings;
 
-pub use game::Game;
+pub use game::{Game, MenuState};
 
 #[cfg(test)]
 mod tests {
