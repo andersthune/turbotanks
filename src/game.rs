@@ -1,13 +1,12 @@
 use crate::settings::Settings;
-use sfml::graphics::{RenderWindow, Drawable};
+use sfml::graphics::{Drawable, RenderStates, RenderTarget, RenderWindow, Sprite, Text};
 use sfml::window::{Event, Key, Style};
-use std::rc::Rc;
 
 /// The main struct representing a running game
 pub struct Game {
     pub settings: Settings,
-    window: RenderWindow,
     settings_path: &'static str,
+    window: RenderWindow,
 }
 
 impl Game {
@@ -25,9 +24,9 @@ impl Game {
         window.set_framerate_limit(settings.framerate_limit);
 
         Game {
-            window,
-            settings_path,
             settings,
+            settings_path,
+            window,
         }
     }
 
@@ -42,7 +41,7 @@ impl Game {
 
 /// An enumeration used to represent actions in the menu. Different
 /// keys might be bound to the same abstract action.
-pub enum MenuAction {
+enum MenuAction {
     Up,
     Down,
     Left,
@@ -52,8 +51,7 @@ pub enum MenuAction {
 
 impl MenuAction {
     /// Get the MenuAction corresponding to a given keycode. Later:
-    /// replace with a method for Game, loading a file containing the
-    /// bindings.
+    /// load a file containing the bindings.
     pub fn get_menu_action_from_key(code: Key) -> Option<MenuAction> {
         match code {
             Key::Up | Key::W => Some(MenuAction::Up),
@@ -66,30 +64,113 @@ impl MenuAction {
     }
 }
 
-/// A struct representing a menu state in the game.
-pub struct MenuState<'a> {
-    game: &'a mut Game,
-    graphics: Vec<Rc<dyn Drawable>>,
-    buttons: Vec<Rc<Button>>,
-    selected_button: Rc<Button>
+trait Clickable: Drawable {
+    fn mark(&self);
+    fn unmark(&self);
+    fn select(&self);
+    fn toggle_right(&mut self) {}
+    fn toggle_left(&mut self) {}
 }
 
-impl<'a> MenuState<'a> {
-    /// Create a new menu state for the given game.
-    pub fn new(game: &'a mut Game) -> MenuState<'a> {
-        MenuState {
-            game,
-            graphics: Vec::new(),
-            buttons: Vec::new(),
-            selected_button: Rc::new()
+struct Button<'a> {
+    text: Text<'a>,
+    effect: fn(),
+}
+
+impl<'a> Clickable for Button<'a> {
+    fn select(&self) {
+        (self.effect)()
+    }
+    fn mark(&self) {}
+    fn unmark(&self) {}
+}
+
+impl<'b> Drawable for Button<'b> {
+    fn draw<'a: 'shader, 'texture, 'shader, 'shader_texture>(
+        &'a self,
+        target: &mut RenderTarget,
+        states: RenderStates<'texture, 'shader, 'shader_texture>,
+    ) {
+        self.text.draw(target, states);
+    }
+}
+
+struct MenuButtonList {
+    button_vec: Vec<Box<dyn Clickable>>,
+    marked_index: usize,
+}
+
+impl MenuButtonList {
+    fn new() -> MenuButtonList {
+        MenuButtonList {
+            button_vec: Vec::new(),
+            marked_index: 0,
         }
     }
 
+    fn push_button(&mut self, button: Box<dyn Clickable>) {
+        self.button_vec.push(button)
+    }
+
+    fn get_marked_button(&self) -> Box<dyn Clickable> {
+        self.button_vec[self.marked_index]
+    }
+
+    fn draw_buttons(&self, target: &mut RenderTarget) {
+        self.button_vec.iter().map(|x| target.draw(&(**x)));
+    }
+
+    fn update_marked_index(&mut self, direction: MenuAction) {
+        let new_marker = match direction {
+            MenuAction::Up => self.marked_index - 1,
+            MenuAction::Down => self.marked_index + 1,
+            _ => 0,
+        };
+
+        self.marked_index = new_marker % self.button_vec.len();
+    }
+
+    fn move_marker(&mut self, direction: MenuAction) {
+        self.get_marked_button().unmark();
+        self.update_marked_index(direction);
+        self.get_marked_button().mark();
+    }
+
+    fn go_right(&mut self) {
+        self.get_marked_button().toggle_right();
+    }
+    fn go_left(&mut self) {
+        self.get_marked_button().toggle_left();
+    }
+    fn select(&mut self) {
+        self.get_marked_button().select();
+    }
+}
+
+/// A struct representing a menu state in the game.
+pub struct MenuState<'a> {
+    game: &'a mut Game,
+    images: Vec<Sprite<'a>>,
+    text: Vec<Text<'a>>,
+    buttons: MenuButtonList,
+    _active: bool,
+}
+
+impl<'a> MenuState<'a> {
     /// Execute the state
     pub fn run_state(&mut self) {
-        while self.game.is_running() {
+        while self.is_active() {
             self.act_on_events();
+            self.draw_menu();
         }
+    }
+
+    fn is_active(&self) -> bool {
+        self.game.is_running() && self._active
+    }
+
+    fn exit(&self) {
+        self._active = false
     }
 
     fn act_on_events(&mut self) {
@@ -105,12 +186,18 @@ impl<'a> MenuState<'a> {
     fn handle_key_press(&mut self, key: Key) {
         if let Some(action) = MenuAction::get_menu_action_from_key(key) {
             match action {
-                MenuAction::Up => ,
-                MenuAction::Down => ,
-                MenuAction::Right => ,
-                MenuAction::Left => ,
-                MenuAction::Enter => ,
+                MenuAction::Up | MenuAction::Down => self.buttons.move_marker(action),
+                MenuAction::Right => self.buttons.go_right(),
+                MenuAction::Left => self.buttons.go_left(),
+                MenuAction::Enter => self.buttons.select(),
             }
         }
+    }
+
+    fn draw_menu(&self) {
+        let target = self.game.window;
+        self.images.iter().map(|x| target.draw(x));
+        self.text.iter().map(|x| target.draw(x));
+        self.buttons.draw_buttons(&mut target);
     }
 }
