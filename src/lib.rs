@@ -1,9 +1,11 @@
 //! Turbo Tanks: A 2D skill-based tank combat arena game
 
 pub mod game;
+pub mod menu;
 mod settings;
 
-pub use game::{Game, MenuState};
+pub use game::Game;
+pub use menu::MainMenuState;
 
 #[cfg(test)]
 mod tests {

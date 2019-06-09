@@ -1,6 +1,6 @@
-use crate::settings::Settings;
-use sfml::graphics::{Drawable, RenderStates, RenderTarget, RenderWindow, Sprite, Text};
-use sfml::window::{Event, Key, Style};
+use crate::game::{Game, GameAction, GameState};
+use sfml::graphics::{Drawable, RenderStates, RenderTarget, Sprite, Text};
+use sfml::window::{Event, Key};
 
 trait Clickable: Drawable {
     fn select(&self);
@@ -130,7 +130,7 @@ impl<'a> MenuState<'a> {
                 GameAction::Up | GameAction::Down => self.buttons.move_marker(action),
                 GameAction::Right => self.buttons.go_right(),
                 GameAction::Left => self.buttons.go_left(),
-                GameAction::Enter => self.buttons.select(),
+                GameAction::Select => self.buttons.select(),
             }
         }
     }

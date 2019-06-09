@@ -4,9 +4,9 @@ use sfml::window::{Key, Style};
 
 /// The main struct representing a running game
 pub struct Game {
+    pub window: RenderWindow,
     pub settings: Settings,
     settings_path: &'static str,
-    window: RenderWindow,
 }
 
 impl Game {
@@ -41,7 +41,7 @@ impl Game {
 
 /// An enumeration used to represent actions in the game. Different
 /// keys might be bound to the same abstract action.
-enum GameAction {
+pub enum GameAction {
     Up,
     Down,
     Left,
@@ -66,7 +66,7 @@ impl GameAction {
     }
 }
 
-trait GameState: Drawable {
+pub trait GameState: Drawable {
     fn new();
     fn run_state(&mut self);
 }
