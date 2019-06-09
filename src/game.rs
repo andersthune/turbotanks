@@ -39,9 +39,9 @@ impl Game {
     }
 }
 
-/// An enumeration used to represent actions in the menu. Different
+/// An enumeration used to represent actions in the game. Different
 /// keys might be bound to the same abstract action.
-enum MenuAction {
+enum GameAction {
     Up,
     Down,
     Left,
@@ -49,16 +49,16 @@ enum MenuAction {
     Enter,
 }
 
-impl MenuAction {
-    /// Get the MenuAction corresponding to a given keycode. Later:
-    /// load a file containing the bindings.
-    pub fn get_menu_action_from_key(code: Key) -> Option<MenuAction> {
+impl GameAction {
+    /// Get the GameAction corresponding to a given keycode. Later:
+    /// let user customize through settings
+    pub fn get_menu_action_from_key(code: Key) -> Option<GameAction> {
         match code {
-            Key::Up | Key::W => Some(MenuAction::Up),
-            Key::Down | Key::S => Some(MenuAction::Down),
-            Key::Right | Key::D => Some(MenuAction::Right),
-            Key::Left | Key::A => Some(MenuAction::Left),
-            Key::Return => Some(MenuAction::Enter),
+            Key::Up | Key::W => Some(GameAction::Up),
+            Key::Down | Key::S => Some(GameAction::Down),
+            Key::Right | Key::D => Some(GameAction::Right),
+            Key::Left | Key::A => Some(GameAction::Left),
+            Key::Return => Some(GameAction::Enter),
             _ => None,
         }
     }
@@ -120,17 +120,17 @@ impl MenuButtonList {
         self.button_vec.iter().map(|x| target.draw(&(**x)));
     }
 
-    fn update_marked_index(&mut self, direction: MenuAction) {
+    fn update_marked_index(&mut self, direction: GameAction) {
         let new_marker = match direction {
-            MenuAction::Up => self.marked_index - 1,
-            MenuAction::Down => self.marked_index + 1,
+            GameAction::Up => self.marked_index - 1,
+            GameAction::Down => self.marked_index + 1,
             _ => 0,
         };
 
         self.marked_index = new_marker % self.button_vec.len();
     }
 
-    fn move_marker(&mut self, direction: MenuAction) {
+    fn move_marker(&mut self, direction: GameAction) {
         self.get_marked_button().unmark();
         self.update_marked_index(direction);
         self.get_marked_button().mark();
@@ -184,12 +184,12 @@ impl<'a> MenuState<'a> {
     }
 
     fn handle_key_press(&mut self, key: Key) {
-        if let Some(action) = MenuAction::get_menu_action_from_key(key) {
+        if let Some(action) = GameAction::get_menu_action_from_key(key) {
             match action {
-                MenuAction::Up | MenuAction::Down => self.buttons.move_marker(action),
-                MenuAction::Right => self.buttons.go_right(),
-                MenuAction::Left => self.buttons.go_left(),
-                MenuAction::Enter => self.buttons.select(),
+                GameAction::Up | GameAction::Down => self.buttons.move_marker(action),
+                GameAction::Right => self.buttons.go_right(),
+                GameAction::Left => self.buttons.go_left(),
+                GameAction::Enter => self.buttons.select(),
             }
         }
     }
